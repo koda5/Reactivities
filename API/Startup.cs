@@ -20,6 +20,8 @@ using API.Extension;
 using FluentValidation.AspNetCore;
 using Application;
 using API.Middleware;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace API
 {
@@ -38,11 +40,19 @@ namespace API
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers().AddFluentValidation(config =>
+            services.AddControllers(opt =>
+            {
+                var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+                opt.Filters.Add(new AuthorizeFilter(policy));//sekoj controller kje bara Authenticaticja
+            }
+            ).AddFluentValidation(config =>
             {
                 config.RegisterValidatorsFromAssemblyContaining<Create>();
             });
             services.AddApplicationService(_config);
+
+            services.AddidentityServices(_config);
+
 
         }
 
@@ -64,6 +74,8 @@ namespace API
 
             app.UseCors("CorsPolicy");
 
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
