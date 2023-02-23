@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Application.Acitivities;
 using Application.Core;
+using Application.Interfaces;
+using Infrastructure.Security;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -36,6 +38,8 @@ namespace API.Extension
 
             services.AddMediatR(typeof(List.Handler).Assembly);
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+            services.AddHttpContextAccessor(); // za moze da go koristime vo Infrastructure
+            services.AddScoped<IUserAccessor, UserAccessor>(); // ova kje ovozmozi za da bidat INJECTED vo handler - ot za kreiranje na aktivnost
 
             return services;
         }
